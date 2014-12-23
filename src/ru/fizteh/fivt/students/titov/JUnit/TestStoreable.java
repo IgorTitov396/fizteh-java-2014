@@ -88,7 +88,7 @@ public class TestStoreable {
     public void testGetIntAt() throws Exception {
         entry.setColumnAt(0, 1);
         entry.setColumnAt(1, "new");
-        assertEquals(entry.getIntAt(0), 1,0);
+        assertTrue(entry.getIntAt(0).equals(1));
 
         boolean exceptionWas = false;
         try {
