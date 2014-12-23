@@ -1,6 +1,7 @@
-package ru.fizteh.fivt.students.titov.MultiFileHashMap;
+package ru.fizteh.fivt.students.titov.multi_file_hash_map;
 
-import ru.fizteh.fivt.students.titov.FileMap.Shell;
+import ru.fizteh.fivt.students.titov.file_map.BadFileException;
+import ru.fizteh.fivt.students.titov.file_map.Shell;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,14 +9,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Main {
-    public static void main(String[] args) {
+    private static final String PROJECTPROPERTY = "fizteh.db.dir";
 
-        if (System.getProperty("fizteh.db.dir") == null) {
-            System.out.println("we need working directory");
+    public static void main(String[] args) throws BadFileException {
+
+        if (System.getProperty(PROJECTPROPERTY) == null) {
+            System.err.println("we need working directory");
             System.exit(6);
         }
         Path dataBaseDirectory
-                = Paths.get(System.getProperty("user.dir")).resolve(System.getProperty("fizteh.db.dir"));
+                = Paths.get(System.getProperty("user.dir")).resolve(System.getProperty(PROJECTPROPERTY));
 
         boolean allRight = true;
         if (Files.exists(dataBaseDirectory)) {
@@ -44,7 +47,7 @@ public class Main {
         setUpShell(myShell);
 
         if (args.length > 0) {
-            allRight = myShell.packetMode(args);
+            allRight = myShell.batchMode(args);
         } else {
             allRight = myShell.interactiveMode();
         }
@@ -57,16 +60,18 @@ public class Main {
 
 
     public static void setUpShell(Shell<MFileHashMap> myShell) {
-        myShell.addCommand(new CommandCreate());
-        myShell.addCommand(new CommandDrop());
-        myShell.addCommand(new CommandUse());
-        myShell.addCommand(new CommandGetDistribute());
-        myShell.addCommand(new CommandPutDistribute());
-        myShell.addCommand(new CommandListDistribute());
-        myShell.addCommand(new CommandRemoveDistribute());
-        myShell.addCommand(new CommandShowTables());
-        myShell.addCommand(new CommandRollback());
-        myShell.addCommand(new CommandCommit());
-        myShell.addCommand(new CommandSize());
+
+        myShell.addCommand(new CreateCommand());
+        myShell.addCommand(new DropCommand());
+        myShell.addCommand(new UseCommand());
+        myShell.addCommand(new GetDistributeCommand());
+        myShell.addCommand(new PutDistributeCommand());
+        myShell.addCommand(new ListDistributeCommand());
+        myShell.addCommand(new RemoveDistributeCommand());
+        myShell.addCommand(new ShowTablesCommand());
+        myShell.addCommand(new RollbackCommand());
+        myShell.addCommand(new CommitCommand());
+        myShell.addCommand(new SizeCommand());
+        myShell.addCommand(new ExitCommand());
     }
 }

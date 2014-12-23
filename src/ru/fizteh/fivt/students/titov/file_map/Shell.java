@@ -1,9 +1,10 @@
-package ru.fizteh.fivt.students.titov.FileMap;
+package ru.fizteh.fivt.students.titov.file_map;
 
 import java.util.HashMap;
 import java.util.Scanner;
 
 public class Shell<T> {
+    private static final String INVITATION = "$ ";
     private HashMap<String, Command<T>> shellCommands;
 
     private T objectForShell;
@@ -17,7 +18,7 @@ public class Shell<T> {
     }
 
     public boolean interactiveMode() {
-        System.out.print("$ ");
+        System.out.print(INVITATION);
         boolean ended = false;
         boolean errorOccuried = false;
 
@@ -49,25 +50,25 @@ public class Shell<T> {
                     if (commandToExecute != null) {
                         if (commandToExecute.numberOfArguments != parsedArguments.length
                                 & commandToExecute.numberOfArguments != -1) {
-                            System.out.println(commandToExecute.name + ": wrong number of arguments");
+                            System.err.println(commandToExecute.name + ": wrong number of arguments");
                             errorOccuried = true;
                         } else if (!commandToExecute.run(objectForShell, parsedArguments)) {
                             errorOccuried = true;
                         }
                     } else {
-                        System.out.println(parsedArguments[0] + ": command not found");
+                        System.err.println(parsedArguments[0] + ": command not found");
                         errorOccuried = true;
                     }
                 }
                 if (!ended) {
-                    System.out.print("$ ");
+                    System.out.print(INVITATION);
                 }
             }
         }
         return !errorOccuried;
     }
 
-    public boolean packetMode(final String[] arguments) {
+    public boolean batchMode(final String[] arguments) {
 
         String[] parsedCommands;
         String[] parsedArguments;
@@ -94,13 +95,13 @@ public class Shell<T> {
             if (commandToExecute != null) {
                 if (commandToExecute.numberOfArguments != parsedArguments.length
                         & commandToExecute.numberOfArguments != -1) {
-                    System.out.println(commandToExecute.name + " wrong number of arguments");
+                    System.err.println(commandToExecute.name + " wrong number of arguments");
                     errorOccuried = true;
                 } else if (!commandToExecute.run(objectForShell, parsedArguments)) {
                     errorOccuried = true;
                 }
             } else {
-                System.out.println(parsedArguments[0] + ": command not found");
+                System.err.println(parsedArguments[0] + ": command not found");
                 errorOccuried = true;
             }
         }

@@ -1,4 +1,4 @@
-package ru.fizteh.fivt.students.titov.JUnit;
+package ru.fizteh.fivt.students.titov.junit;
 
 import org.junit.After;
 import org.junit.Before;
@@ -6,8 +6,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ru.fizteh.fivt.storage.structured.*;
-import ru.fizteh.fivt.students.titov.FileMap.FileMap;
-import ru.fizteh.fivt.students.titov.MultiFileHashMap.MFileHashMapFactory;
+import ru.fizteh.fivt.students.titov.file_map.FileMap;
+import ru.fizteh.fivt.students.titov.multi_file_hash_map.MFileHashMapFactory;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -84,16 +84,16 @@ public class TestTable {
 
     @Test
     public void testGetName() throws Exception {
-        assertTrue(testTable.getName().equals(tableName));
+        assertEquals(testTable.getName(), tableName);
     }
 
     @Test
     public void testGet() throws Exception {
         assertNull(testTable.get(key));
         testTable.put(key, value);
-        assertTrue(testTable.get(key).equals(value));
+        assertEquals(testTable.get(key), value);
         testTable.put(key, newValue);
-        assertTrue(testTable.get(key).equals(newValue));
+        assertEquals(testTable.get(key), newValue);
         testTable.remove(key);
         assertNull(testTable.get(key));
         testTable.rollback();
@@ -101,7 +101,7 @@ public class TestTable {
         testTable.put(key, value);
         testTable.commit();
         testTable.put(key, newValue);
-        assertTrue(testTable.get(key).equals(newValue));
+        assertEquals(testTable.get(key), newValue);
         testTable.remove(key);
         assertNull(testTable.get(key));
     }
@@ -110,24 +110,24 @@ public class TestTable {
     public void testRemove() throws Exception {
         assertNull(testTable.remove(key));
         testTable.put(key, value);
-        assertTrue(testTable.remove(key).equals(value));
+        assertEquals(testTable.remove(key), value);
 
         testTable.rollback();
         testTable.put(key, value);
-        assertTrue(testTable.remove(key).equals(value));
+        assertEquals(testTable.remove(key), value);
         testTable.put(key, value);
         testTable.commit();
-        assertTrue(testTable.remove(key).equals(value));
+        assertEquals(testTable.remove(key), value);
         assertNull(testTable.remove(key));
     }
 
     @Test
     public void testPutCorrectValue() throws Exception {
         assertNull(testTable.put(key, value));
-        assertTrue(testTable.put(key, value).equals(value));
-        assertTrue(testTable.get(key).equals(value));
-        assertTrue(testTable.put(key, newValue).equals(value));
-        assertTrue(testTable.get(key).equals(newValue));
+        assertEquals(testTable.put(key, value), value);
+        assertEquals(testTable.get(key), value);
+        assertEquals(testTable.put(key, newValue), value);
+        assertEquals(testTable.get(key), newValue);
         testTable.remove(key);
         assertNull(testTable.put(key, value));
 
@@ -145,7 +145,7 @@ public class TestTable {
         testTable.commit();
         for (int i = 0; i < size; ++i) {
             valueForCommit.setColumnAt(0, 999 + i);
-            assertTrue(testTable.get(keyForCommit + i).equals(valueForCommit));
+            assertEquals(testTable.get(keyForCommit + i), valueForCommit);
         }
 
         Storeable freshValue = ((FileMap) testTable).getTableProvider().createFor(testTable);
@@ -159,11 +159,11 @@ public class TestTable {
         valueForCommit.setColumnAt(0, 1000);
         assertNull(testTable.put(keyForCommit + 1, valueForCommit));
         valueForCommit.setColumnAt(0, 1001);
-        assertTrue(testTable.put(keyForCommit + 2, freshValue).equals(valueForCommit));
+        assertEquals(testTable.put(keyForCommit + 2, freshValue), valueForCommit);
 
         Storeable changedFreshValue = freshValue;
         changedFreshValue.setColumnAt(1, "CHANGED");
-        assertTrue(testTable.put(keyForCommit + 2, changedFreshValue).equals(freshValue));
+        assertEquals(testTable.put(keyForCommit + 2, changedFreshValue), freshValue);
     }
 
     @Test
@@ -173,9 +173,9 @@ public class TestTable {
             value.setColumnAt(0, i);
             testTable.put(key + i, value);
         }
-        assertTrue(testTable.size() == size);
+        assertEquals(testTable.size(), size);
         testTable.remove(key + 0);
-        assertTrue(testTable.size() == size - 1);
+        assertEquals(testTable.size(), size - 1);
     }
 
     @Test
@@ -188,12 +188,12 @@ public class TestTable {
         testTable.remove(key + 0);
         testTable.remove(key + 2);
         testTable.put(key + 1, newValue);
-        assertTrue(testTable.rollback() == size - 2);
+        assertEquals(testTable.rollback(), size - 2);
         testTable.put(key, value);
-        assertTrue(testTable.rollback() == 1);
+        assertEquals(testTable.rollback(), 1);
         testTable.put(key, value);
         testTable.commit();
-        assertTrue(testTable.rollback() == 0);
+        assertEquals(testTable.rollback(), 0);
     }
 
     @Test
@@ -206,14 +206,14 @@ public class TestTable {
         testTable.remove(key + 0);
         testTable.remove(key + 2);
         testTable.put(key + 1, newValue);
-        assertTrue(testTable.commit() == size - 2);
-        assertTrue(testTable.rollback() == 0);
+        assertEquals(testTable.commit(), size - 2);
+        assertEquals(testTable.rollback(), 0);
         testTable.put(key, newValue);
         testTable.remove(key);
-        assertTrue(testTable.commit() == 0);
+        assertEquals(testTable.commit(), 0);
         newValue.setColumnAt(0, 111111);
         testTable.put(key + 1, newValue);
-        assertTrue(testTable.commit() == 1);
+        assertEquals(testTable.commit(), 1);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -242,12 +242,12 @@ public class TestTable {
 
     @Test
     public void testGetColumnsCount() {
-        assertTrue(testTable.getColumnsCount() == 3);
+        assertEquals(testTable.getColumnsCount(), 3);
     }
 
     @Test
     public void testGetColumnType() {
-        assertTrue(testTable.getColumnType(0).equals(Integer.class));
+        assertEquals(testTable.getColumnType(0), Integer.class);
         boolean exceptionWas = false;
         try {
             testTable.getColumnType(9);

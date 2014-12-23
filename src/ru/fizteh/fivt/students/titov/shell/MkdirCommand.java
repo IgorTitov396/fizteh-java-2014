@@ -2,8 +2,8 @@ package ru.fizteh.fivt.students.titov.shell;
 
 import java.nio.file.Files;
 
-public class CommandMkdir extends ru.fizteh.fivt.students.titov.shell.Command {
-    public CommandMkdir() {
+public class MkdirCommand extends ru.fizteh.fivt.students.titov.shell.Command {
+    public MkdirCommand() {
         name = "mkdir";
         numberOfArguments = 2;
     }

@@ -1,4 +1,4 @@
-package ru.fizteh.fivt.students.titov.JUnit;
+package ru.fizteh.fivt.students.titov.junit;
 
 import org.junit.After;
 import org.junit.Before;
@@ -6,8 +6,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ru.fizteh.fivt.storage.structured.*;
-import ru.fizteh.fivt.students.titov.MultiFileHashMap.MFileHashMapFactory;
-import ru.fizteh.fivt.students.titov.StoreablePackage.TypesUtils;
+import ru.fizteh.fivt.students.titov.multi_file_hash_map.MFileHashMapFactory;
+import ru.fizteh.fivt.students.titov.storeable.TypesUtils;
 import ru.fizteh.fivt.students.titov.shell.FileUtils;
 
 import java.io.IOException;
@@ -134,7 +134,7 @@ public class TestTableProvider {
             value.setColumnAt(1, "example");
 
             String serValue = "<row><col>100</col><col>example</col></row>";
-            assertTrue(provider.serialize(newTable, value).equals(serValue));
+            assertEquals(provider.serialize(newTable, value), serValue);
 
             Table wrongTable;
             wrongTable = provider.createTable(tableName + 2, wrongTypeList);
@@ -165,7 +165,7 @@ public class TestTableProvider {
             try {
                 Storeable deserValue = provider.deserialize(newTable, stringForParse);
                 assertTrue(deserValue.getIntAt(0).equals(100));
-                assertTrue(deserValue.getStringAt(1).equals("example"));
+                assertEquals(deserValue.getStringAt(1), "example");
             } catch (ParseException e) {
                 assertNotNull(null);
             }
@@ -196,7 +196,7 @@ public class TestTableProvider {
             Table newTable;
             newTable = provider.createTable(tableName, typeList);
             Storeable temp = provider.createFor(newTable);
-            assertTrue(TypesUtils.getSizeOfStoreable(temp) == newTable.getColumnsCount());
+            assertEquals(TypesUtils.getSizeOfStoreable(temp), newTable.getColumnsCount());
         } catch (IOException e) {
             //suppress
         }
@@ -211,7 +211,7 @@ public class TestTableProvider {
             value.add(100);
             value.add("new");
             Storeable temp = provider.createFor(newTable, value);
-            assertTrue(TypesUtils.getSizeOfStoreable(temp) == newTable.getColumnsCount());
+            assertEquals(TypesUtils.getSizeOfStoreable(temp), newTable.getColumnsCount());
             boolean exceptionWas = false;
 
             try {

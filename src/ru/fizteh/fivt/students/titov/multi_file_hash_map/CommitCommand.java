@@ -1,20 +1,19 @@
-package ru.fizteh.fivt.students.titov.MultiFileHashMap;
+package ru.fizteh.fivt.students.titov.multi_file_hash_map;
 
-import ru.fizteh.fivt.students.titov.FileMap.FileMap;
+import ru.fizteh.fivt.students.titov.file_map.FileMap;
 
 import java.io.IOException;
 
-public class CommandCommit extends CommandMultiFileHashMap{
-    public CommandCommit() {
-        name = "commit";
-        numberOfArguments = 1;
+public class CommitCommand extends MultiFileHashMapCommand {
+    public CommitCommand() {
+        initialize("commit", 1);
     }
 
     @Override
     public boolean run(MFileHashMap myMap, String[] args) {
         FileMap currentTable = myMap.getCurrentTable();
         if (currentTable == null) {
-            System.out.println("no table");
+            isTable(currentTable);
         } else {
             try {
                 System.out.println(currentTable.commit());

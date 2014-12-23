@@ -1,4 +1,4 @@
-package ru.fizteh.fivt.students.titov.MultiFileHashMap;
+package ru.fizteh.fivt.students.titov.multi_file_hash_map;
 
 import ru.fizteh.fivt.storage.structured.TableProvider;
 import ru.fizteh.fivt.storage.structured.TableProviderFactory;

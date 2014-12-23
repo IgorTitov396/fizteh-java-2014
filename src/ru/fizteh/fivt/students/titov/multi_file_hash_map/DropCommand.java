@@ -1,11 +1,10 @@
-package ru.fizteh.fivt.students.titov.MultiFileHashMap;
+package ru.fizteh.fivt.students.titov.multi_file_hash_map;
 
 import java.io.IOException;
 
-public class CommandDrop extends CommandMultiFileHashMap {
-    public CommandDrop() {
-        name = "drop";
-        numberOfArguments = 2;
+public class DropCommand extends MultiFileHashMapCommand {
+    public DropCommand() {
+        initialize("drop", 2);
     }
 
     @Override
@@ -17,9 +16,9 @@ public class CommandDrop extends CommandMultiFileHashMap {
             System.err.println("io exception while removing directory");
             return false;
         } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         } catch (IllegalStateException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
         return true;
     }

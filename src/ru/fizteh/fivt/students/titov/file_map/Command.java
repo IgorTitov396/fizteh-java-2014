@@ -1,4 +1,4 @@
-package ru.fizteh.fivt.students.titov.FileMap;
+package ru.fizteh.fivt.students.titov.file_map;
 
 public abstract class Command<T> {
     protected String name;

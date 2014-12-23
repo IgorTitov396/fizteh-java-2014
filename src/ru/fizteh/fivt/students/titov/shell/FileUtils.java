@@ -6,7 +6,7 @@ import java.nio.file.Path;
 
 public class FileUtils {
     public static boolean mkdir(Path newDirectory) {
-        CommandMkdir command = new CommandMkdir();
+        MkdirCommand command = new MkdirCommand();
         String[] args = {"mkdir",
                          newDirectory.toString()
         };

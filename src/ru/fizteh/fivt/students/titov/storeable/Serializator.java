@@ -1,8 +1,8 @@
-package ru.fizteh.fivt.students.titov.StoreablePackage;
+package ru.fizteh.fivt.students.titov.storeable;
 
 import ru.fizteh.fivt.storage.structured.Storeable;
 import ru.fizteh.fivt.storage.structured.Table;
-import ru.fizteh.fivt.students.titov.FileMap.FileMap;
+import ru.fizteh.fivt.students.titov.file_map.FileMap;
 
 import javax.xml.stream.*;
 import javax.xml.stream.events.StartElement;
@@ -12,6 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class Serializator {
@@ -23,8 +24,8 @@ public class Serializator {
         Object get(String s) throws IllegalArgumentException;
     }
 
-    private static HashMap<Class<?>, GetSmthSer> toFindApproriateSer;
-    private static HashMap<Class<?>, GetSmthDeser> toFindApproriateDeser;
+    private static Map<Class<?>, GetSmthSer> toFindApproriateSer;
+    private static Map<Class<?>, GetSmthDeser> toFindApproriateDeser;
     static {
         toFindApproriateSer = new HashMap<>();
         toFindApproriateDeser = new HashMap<>();

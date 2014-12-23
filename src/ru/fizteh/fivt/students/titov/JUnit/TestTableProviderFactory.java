@@ -1,11 +1,11 @@
-package ru.fizteh.fivt.students.titov.JUnit;
+package ru.fizteh.fivt.students.titov.junit;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import ru.fizteh.fivt.storage.structured.TableProviderFactory;
-import ru.fizteh.fivt.students.titov.MultiFileHashMap.MFileHashMapFactory;
+import ru.fizteh.fivt.students.titov.multi_file_hash_map.MFileHashMapFactory;
 import ru.fizteh.fivt.students.titov.shell.FileUtils;
 
 import java.io.IOException;

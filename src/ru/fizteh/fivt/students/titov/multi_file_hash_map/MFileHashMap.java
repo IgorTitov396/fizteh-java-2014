@@ -1,4 +1,4 @@
-package ru.fizteh.fivt.students.titov.MultiFileHashMap;
+package ru.fizteh.fivt.students.titov.multi_file_hash_map;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -12,15 +12,16 @@ import ru.fizteh.fivt.storage.structured.ColumnFormatException;
 import ru.fizteh.fivt.storage.structured.Table;
 import ru.fizteh.fivt.storage.structured.TableProvider;
 import ru.fizteh.fivt.storage.structured.Storeable;
-import ru.fizteh.fivt.students.titov.FileMap.FileMap;
-import ru.fizteh.fivt.students.titov.StoreablePackage.AbstractStoreable;
-import ru.fizteh.fivt.students.titov.StoreablePackage.TypesUtils;
-import ru.fizteh.fivt.students.titov.StoreablePackage.Serializator;
+import ru.fizteh.fivt.students.titov.file_map.BadFileException;
+import ru.fizteh.fivt.students.titov.file_map.FileMap;
+import ru.fizteh.fivt.students.titov.storeable.AbstractStoreable;
+import ru.fizteh.fivt.students.titov.storeable.TypesUtils;
+import ru.fizteh.fivt.students.titov.storeable.Serializator;
 import ru.fizteh.fivt.students.titov.shell.FileUtils;
 
 public class MFileHashMap implements TableProvider {
     private String dataBaseDirectory;
-    private HashMap<String, FileMap> tables;
+    private Map<String, FileMap> tables;
     private FileMap currentTable;
     public MFileHashMap(String newDirectory) {
         dataBaseDirectory = newDirectory;
@@ -135,12 +136,8 @@ public class MFileHashMap implements TableProvider {
         return result;
     }
 
-    public void showTables() {
-        Set<Entry<String, FileMap>> pairSet = tables.entrySet();
-        for (Entry<String, FileMap> oneTable: pairSet) {
-            System.out.println(oneTable.getKey() + " "
-                + oneTable.getValue().size());
-        }
+    public Map<String, FileMap> getTables() {
+        return tables;
     }
 
     public void setCurrentTable(FileMap newCurrentTable) {
@@ -151,7 +148,7 @@ public class MFileHashMap implements TableProvider {
         return currentTable;
     }
 
-    public boolean init() {
+    public boolean init() throws BadFileException {
         String[] listOfFiles = new File(dataBaseDirectory).list();
         for (String oneFile: listOfFiles) {
             Path oneTablePath = Paths.get(dataBaseDirectory, oneFile);

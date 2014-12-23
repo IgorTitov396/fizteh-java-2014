@@ -1,10 +1,10 @@
-package ru.fizteh.fivt.students.titov.FileMap;
+package ru.fizteh.fivt.students.titov.file_map;
 
 import ru.fizteh.fivt.storage.structured.Storeable;
 import ru.fizteh.fivt.storage.structured.Table;
 import ru.fizteh.fivt.storage.structured.TableProvider;
-import ru.fizteh.fivt.students.titov.StoreablePackage.TypesUtils;
-import ru.fizteh.fivt.students.titov.StoreablePackage.Serializator;
+import ru.fizteh.fivt.students.titov.storeable.TypesUtils;
+import ru.fizteh.fivt.students.titov.storeable.Serializator;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -17,34 +17,37 @@ import java.text.ParseException;
 import java.util.*;
 
 public class FileMap implements Table {
-    private static final int MAXNUMBEROFDIRS = 16;
-    private static final int MAXNUMBEROFFILES = 16;
-    private HashMap<String, Storeable> stableData;
-    private HashMap<String, Storeable> addedData;
-    private HashMap<String, Storeable> changedData;
-    private HashSet<String> removedData;
+    private static final int MAX_NUMBER_OF_DIRS = 16;
+    private static final int MAX_NUMBER_OF_FILES = 16;
+    private static final String SUFFIX_OF_DIRECTORY = ".dir";
+    private static final String SUFFIX_OF_FILE = ".dat";
+    private static final String FILE_ENCODING = "UTF-8";
+    private Map<String, Storeable> stableData;
+    private Map<String, Storeable> addedData;
+    private Map<String, Storeable> changedData;
+    private Set<String> removedData;
     private List<Class<?>> typeList;
     private int numberOfColumns;
     private String directoryOfTable;
     private TableProvider parent;
 
     private int getNumberOfDirectory(int hash) {
-        int result = hash % MAXNUMBEROFDIRS;
+        int result = hash % MAX_NUMBER_OF_DIRS;
         if (result < 0) {
-            result += MAXNUMBEROFDIRS;
+            result += MAX_NUMBER_OF_DIRS;
         }
         return result;
     }
 
     private int getNumberOfFile(int hash) {
-        int result = hash / MAXNUMBEROFDIRS % MAXNUMBEROFFILES;
+        int result = hash / MAX_NUMBER_OF_DIRS % MAX_NUMBER_OF_FILES;
         if (result < 0) {
-            result += MAXNUMBEROFFILES;
+            result += MAX_NUMBER_OF_FILES;
         }
         return result;
     }
 
-    private void clearStaff() {
+    private void clearAll() {
         removedData.clear();
         addedData.clear();
         changedData.clear();
@@ -53,7 +56,7 @@ public class FileMap implements Table {
     /**
      * Create empty Filemap
      *
-     * @param newDirectory - directory of this FileMap
+     * @param newDirectory - directory of this file_map
      * @param newTypeList - list of types (signature of table)
      */
     public FileMap(String newDirectory, List<Class<?>> newTypeList, TableProvider newParent) {
@@ -164,7 +167,7 @@ public class FileMap implements Table {
     @Override
     public int rollback() {
         int result = changedData.size() + removedData.size() + addedData.size();
-        clearStaff();
+        clearAll();
         return result;
     }
 
@@ -190,7 +193,7 @@ public class FileMap implements Table {
             }
         }
 
-        clearStaff();
+        clearAll();
         if (allRight) {
             return result;
         } else {
@@ -210,24 +213,24 @@ public class FileMap implements Table {
         return addedData.size() + changedData.size() + removedData.size();
     }
 
-    public boolean init() {
+    public boolean init() throws BadFileException {
         String[] listOfDirectories = new File(directoryOfTable).list();
         if (listOfDirectories == null) {
             return true;
         }
-        for (String oneDirectory: listOfDirectories) {
-            String currentDirectory = directoryOfTable + System.getProperty("file.separator")
-                    + oneDirectory;
+        for (String directory: listOfDirectories) {
+            String currentDirectory = directoryOfTable + File.separator
+                    + directory;
             if (!Files.isDirectory(Paths.get(currentDirectory))) {
                 continue;
             }
             String[] listOfFiles = new File(currentDirectory).list();
             for (String oneFile : listOfFiles) {
-                String currentFile = currentDirectory + System.getProperty("file.separator")
+                String currentFile = currentDirectory + File.separator
                         + oneFile;
-                int numberOfDirectory = oneDirectory.charAt(0) - '0';
-                if (oneDirectory.charAt(1) != '.') {
-                    numberOfDirectory = 10 * numberOfDirectory + oneDirectory.charAt(1) - '0';
+                int numberOfDirectory = directory.charAt(0) - '0';
+                if (directory.charAt(1) != '.') {
+                    numberOfDirectory = 10 * numberOfDirectory + directory.charAt(1) - '0';
                 }
                 int numberOfFile = oneFile.charAt(0) - '0';
                 if (oneFile.charAt(1) != '.') {
@@ -241,8 +244,7 @@ public class FileMap implements Table {
                         bufferFromDisk =
                                 inputChannel.map(MapMode.READ_ONLY, 0, inputChannel.size());
                     } catch (IOException e) {
-                        System.out.println("io exception");
-                        return false;
+                        throw new BadFileException(e);
                     }
                     try {
                         while (bufferFromDisk.hasRemaining()) {
@@ -257,6 +259,10 @@ public class FileMap implements Table {
                                 throw new BadFileException();
                             }
 
+                            if (keySize < 0) {
+                                throw new BadFileException();
+                            }
+
                             if (bufferFromDisk.remaining() >= keySize) {
                                 bufferFromDisk.get(key, 0, key.length);
                             } else {
@@ -265,6 +271,9 @@ public class FileMap implements Table {
 
                             if (bufferFromDisk.remaining() >= 4) {
                                 valueSize = bufferFromDisk.getInt();
+                                if (valueSize < 0) {
+                                    throw new BadFileException();
+                                }
                                 value = new byte[valueSize];
                             } else {
                                 throw new BadFileException();
@@ -275,41 +284,40 @@ public class FileMap implements Table {
                                 throw new BadFileException();
                             }
 
-                            String keyString = new String(key, "UTF-8");
+                            String keyString = new String(key, FILE_ENCODING);
                             if (getNumberOfDirectory(keyString.hashCode()) != numberOfDirectory
                                     || getNumberOfFile(keyString.hashCode()) != numberOfFile) {
                                 throw new BadFileException();
                             }
 
                             try {
-                                stableData.put(new String(key, "UTF-8"),
+                                stableData.put(new String(key, FILE_ENCODING),
                                         Serializator.deserialize(this, new String(value, "UTF-8")));
                             } catch (UnsupportedEncodingException e) {
-                                System.out.println("unsupported encoding");
-                                return false;
+                                throw new BadFileException(e);
                             } catch (ParseException e) {
-                                System.out.println("parse exception");
+                                throw new BadFileException(e);
                             }
                         }
                     } catch (NullPointerException e) {
-                        System.out.println("null pointer exception");
+                        throw new BadFileException(e);
                     }
                 } catch (FileNotFoundException e) {
-                    System.out.println("file not found");
-                    return false;
+                    throw new BadFileException(e);
                 } catch (BadFileException e) {
-                    System.out.println("problems with database file");
-                    return false;
+                    throw new BadFileException(e);
                 } catch (IOException e) {
-                    System.out.println("io exception");
-                    return false;
+                    throw new BadFileException(e);
                 }
             }
         }
         return true;
     }
 
-    public boolean save(String key, boolean appendFile) {
+    /**
+     * Returns True if the record on the disc was successful and otherwise False.
+     */
+    public boolean save(String key, boolean appendFile) throws BadFileException {
         HashSet<String> keySet = new HashSet<>();
         ByteBuffer bufferForSize = ByteBuffer.allocate(4);
 
@@ -330,22 +338,22 @@ public class FileMap implements Table {
 
         Path directoryForsave;
         Path fileForsave;
-        directoryForsave = Paths.get(directoryOfTable, numberOfDirectory + ".dir");
+        directoryForsave = Paths.get(directoryOfTable, numberOfDirectory + SUFFIX_OF_DIRECTORY);
         if (!Files.exists(directoryForsave)) {
             try {
                 Files.createDirectory(directoryForsave);
             } catch (IOException e) {
-                System.out.println("error while creating directory for save");
+                System.err.println("error while creating directory for save");
                 return false;
             }
         }
 
-        fileForsave = Paths.get(directoryForsave.toString(), numberOfFile + ".dat");
+        fileForsave = Paths.get(directoryForsave.toString(), numberOfFile + SUFFIX_OF_FILE);
         if (!Files.exists(fileForsave)) {
             try {
                 Files.createFile(fileForsave);
             } catch (IOException e) {
-                System.out.println("error while creating file for save");
+                System.err.println("error while creating file for save");
                 return false;
             }
         }
@@ -361,18 +369,18 @@ public class FileMap implements Table {
                     outputStream.write(bufferForSize.putInt(0, valueByte.length).array());
                     outputStream.write(valueByte);
                 } catch (UnsupportedEncodingException e) {
-                    System.out.println("unsupported encoding");
+                    System.err.println("unsupported encoding");
                     return false;
                 } catch (IOException e) {
-                    System.out.println("io exception");
+                    System.err.println("io exception");
                     return false;
                 }
             }
         } catch (FileNotFoundException e) {
-            System.out.println("file not found");
+            System.err.println("file not found");
             return false;
         } catch (IOException e) {
-            System.out.println("io exception");
+            System.err.println("io exception");
             return false;
         }
 
@@ -382,22 +390,20 @@ public class FileMap implements Table {
         return true;
     }
 
-    public boolean deleteEmptyFiles(Path directory, Path file) {
+    public boolean deleteEmptyFiles(Path directory, Path file) throws BadFileException {
         try {
             if (Files.size(file) == 0) {
                 Files.delete(file);
             }
         } catch (IOException e) {
-            System.err.println("error while deleting data base file");
-            return false;
+            throw new BadFileException(e);
         }
         String[] listOfFiles = new File(directory.toString()).list();
         if (listOfFiles.length == 0) {
             try {
                 Files.delete(directory);
             } catch (IOException e) {
-                System.err.println("error while deleting directory");
-                return false;
+                throw new BadFileException(e);
             }
         }
         return true;

@@ -1,11 +1,11 @@
-package ru.fizteh.fivt.students.titov.JUnit;
+package ru.fizteh.fivt.students.titov.junit;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import ru.fizteh.fivt.storage.structured.*;
-import ru.fizteh.fivt.students.titov.MultiFileHashMap.MFileHashMapFactory;
+import ru.fizteh.fivt.students.titov.multi_file_hash_map.MFileHashMapFactory;
 import ru.fizteh.fivt.students.titov.shell.FileUtils;
 
 import java.io.IOException;
@@ -73,7 +73,7 @@ public class TestStoreable {
     @Test
     public void testGetColumnAt() throws Exception {
         entry.setColumnAt(0, 1);
-        assertTrue((entry.getColumnAt(0)).equals(1));
+        assertEquals((entry.getColumnAt(0)), 1);
 
         boolean exceptionWas = false;
         try {
@@ -88,7 +88,7 @@ public class TestStoreable {
     public void testGetIntAt() throws Exception {
         entry.setColumnAt(0, 1);
         entry.setColumnAt(1, "new");
-        assertTrue(entry.getIntAt(0) == 1);
+        assertEquals(entry.getIntAt(0), 1,0);
 
         boolean exceptionWas = false;
         try {

@@ -1,15 +1,14 @@
-package ru.fizteh.fivt.students.titov.MultiFileHashMap;
+package ru.fizteh.fivt.students.titov.multi_file_hash_map;
 
 import ru.fizteh.fivt.storage.structured.ColumnFormatException;
-import ru.fizteh.fivt.students.titov.StoreablePackage.TypesUtils;
+import ru.fizteh.fivt.students.titov.storeable.TypesUtils;
 
 import java.io.IOException;
 import java.util.List;
 
-public class CommandCreate extends CommandMultiFileHashMap {
-    public CommandCreate() {
-        name = "create";
-        numberOfArguments = -1;
+public class CreateCommand extends MultiFileHashMapCommand {
+    public CreateCommand() {
+        initialize("create", -1);
     }
 
     @Override
@@ -33,7 +32,7 @@ public class CommandCreate extends CommandMultiFileHashMap {
         try {
             types = TypesUtils.toTypeList(concatArgs.split("\\s+"));
         } catch (ColumnFormatException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
             return false;
         }
         try {

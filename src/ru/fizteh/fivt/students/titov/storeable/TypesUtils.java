@@ -1,4 +1,4 @@
-package ru.fizteh.fivt.students.titov.StoreablePackage;
+package ru.fizteh.fivt.students.titov.storeable;
 
 import ru.fizteh.fivt.storage.structured.ColumnFormatException;
 import ru.fizteh.fivt.storage.structured.Storeable;
